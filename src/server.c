@@ -159,8 +159,23 @@ void handle_http_request(int fd, struct cache *cache)
     ///////////////////
 
     // Read the first two components of the first line of the request 
+
+    // INIT variable for http method
+    char http_method[5];
+
+    // INIT variable for file path
+    char file_path[10];
+
+    // ASSIGN http method into variable
+    sscanf(request, "%s %s", http_method, file_path);
  
     // If GET, handle the get endpoints
+
+    // IF method is GET
+    if (strcmp(http_method, "GET") == 0)
+    {
+        printf("GET method\n");
+    }
 
     //    Check if it's /d20 and handle that special case
     //    Otherwise serve the requested file by calling get_file()
