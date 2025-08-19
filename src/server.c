@@ -174,7 +174,11 @@ void handle_http_request(int fd, struct cache *cache)
     // IF method is GET
     if (strcmp(http_method, "GET") == 0)
     {
-        printf("GET method\n");
+        // IF url path is /d20
+        if (strcmp(file_path, "/d20") == 0)
+        {
+            printf("URL path is /d20\n");
+        }
     }
 
     //    Check if it's /d20 and handle that special case
