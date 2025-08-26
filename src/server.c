@@ -66,10 +66,10 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     ///////////////////
 
     // ASSIGN response with HTTP format
-    sprintf(response, "%s\n Date: %s Connection: close\n Content-Length: %i\n Content-Type: %s\n\n", header, asctime(info), content_length, content_type);
+    sprintf(response, "%s\nDate: %sConnection: close\nContent-Length: %i\nContent-Type: %s\n\n%s", header, asctime(info), content_length, content_type, (char *)body);
 
     // INIT response_length of body and header
-    int response_length = strlen(body) + strlen(header);
+    int response_length = strlen(response);
 
     // Send it all!
     int rv = send(fd, response, response_length, 0);
