@@ -100,11 +100,30 @@ void get_d20(int fd)
     // INIT randomised number between 1 and 20
     int random_number = rand() % (max - min + 1) + min;
 
+    // INIT buff_number
+    char buff_number[4];
+
+    // GET random number into the buffer
+    sprintf(buff_number, "%d", random_number);
+
+    // INIT byte_counter from buffer
+    int byte_length = 0;
+
+    // FOR every number inside the buffer
+    for (int i = 0; buff_number[i] != NULL; i++)
+    {
+        // COUNTER UP byte_length
+        byte_length++;
+    }
+    // ENDFOR
+
     // Use send_response() to send it back as text/plain data
 
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
+    send_response(fd, "HTTP/1.1 200 OK", "text/plain", buff_number, byte_length);
 }
 
 /**
@@ -198,7 +217,8 @@ void handle_http_request(int fd, struct cache *cache)
         if (strcmp(file_path, "/d20") == 0)
         {
             // printf("URL path is /d20\n");
-            resp_404(fd);
+            // resp_404(fd);
+            get_d20(fd);
         }
     }
 
