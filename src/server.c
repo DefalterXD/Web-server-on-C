@@ -55,18 +55,30 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
 
     // Build HTTP response and store it in response
 
+    // GET time for the request
+    time_t rawtime;
+    struct tm *info;
+    time (&rawtime);
+    info = localtime(&rawtime);
+
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
 
+    // ASSIGN response with HTTP format
+    sprintf(response, "%s\n Date: %s Connection: close\n Content-Length: %i\n Content-Type: %s\n\n", header, asctime(info), content_length, content_type);
+
+    // INIT response_length of body and header
+    int response_length = strlen(body) + strlen(header);
+
     // Send it all!
-    // int rv = send(fd, response, response_length, 0);
+    int rv = send(fd, response, response_length, 0);
 
-    // if (rv < 0) {
-    //     perror("send");
-    // }
+    if (rv < 0) {
+        perror("send");
+    }
 
-    // return rv;
+    return rv;
 }
 
 
@@ -80,6 +92,7 @@ void get_d20(int fd)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
 
     // Use send_response() to send it back as text/plain data
 
@@ -177,7 +190,8 @@ void handle_http_request(int fd, struct cache *cache)
         // IF url path is /d20
         if (strcmp(file_path, "/d20") == 0)
         {
-            printf("URL path is /d20\n");
+            // printf("URL path is /d20\n");
+            resp_404(fd);
         }
     }
 
