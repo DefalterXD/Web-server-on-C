@@ -67,11 +67,20 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     // IMPLEMENT ME! //
     ///////////////////
 
-    // ASSIGN response with HTTP format
-    sprintf(response, "%s\nDate: %s\nConnection: close\nContent-Length: %i\nContent-Type: %s\n\n%s", header, response_format, content_length, content_type, (unsigned char *)body);
+    // INIT length of header response 
+    int header_length = snprintf(response, max_response_size,
+        "%s\n" 
+        "Date: %s\n"
+        "Connection: close\n"
+        "Content-Length: %i\n"
+        "Content-Type: %s\n"
+        "\n", header, response_format, content_length, content_type);
+        
+    // APPEND body into response buffer after header
+    memcpy(response + header_length, body, content_length);
 
     // INIT response_length of body and header
-    int response_length = strlen(response);
+    int response_length = header_length + content_length;
 
     // Send it all!
     int rv = send(fd, response, response_length, 0);
