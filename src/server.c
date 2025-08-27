@@ -205,7 +205,7 @@ void handle_http_request(int fd, struct cache *cache)
     char http_method[5];
 
     // INIT variable for file path
-    char file_path[10];
+    char file_path[2000];
 
     // ASSIGN http method into variable
     sscanf(request, "%s %s", http_method, file_path);
