@@ -112,7 +112,7 @@ void get_d20(int fd)
     int byte_length = 0;
 
     // FOR every number inside the buffer
-    for (int i = 0; buff_number[i] != NULL; i++)
+    for (int i = 0; buff_number[i] != '\0'; i++)
     {
         // COUNTER UP byte_length
         byte_length++;
