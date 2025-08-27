@@ -56,17 +56,19 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     // Build HTTP response and store it in response
 
     // GET time for the request
+    char response_format[50];
     time_t rawtime;
-    struct tm *info;
     time(&rawtime);
+    struct tm *info;
     info = localtime(&rawtime);
+    strftime(response_format, sizeof response_format, "%a %b %d %H:%M:%S %Z %Y", info);
 
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
 
     // ASSIGN response with HTTP format
-    sprintf(response, "%s\nDate: %sConnection: close\nContent-Length: %i\nContent-Type: %s\n\n%s", header, asctime(info), content_length, content_type, (char *)body);
+    sprintf(response, "%s\nDate: %s\nConnection: close\nContent-Length: %i\nContent-Type: %s\n\n%s", header, response_format, content_length, content_type, (unsigned char *)body);
 
     // INIT response_length of body and header
     int response_length = strlen(response);
