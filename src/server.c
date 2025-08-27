@@ -214,10 +214,10 @@ void handle_http_request(int fd, struct cache *cache)
     char http_method[5];
 
     // INIT variable for file path
-    char file_path[2000];
+    char file_route[2000];
 
     // ASSIGN http method into variable
-    sscanf(request, "%s %s", http_method, file_path);
+    sscanf(request, "%s %s", http_method, file_route);
 
     // If GET, handle the get endpoints
 
@@ -225,7 +225,7 @@ void handle_http_request(int fd, struct cache *cache)
     if (strcmp(http_method, "GET") == 0)
     {
         // IF url path is /d20
-        if (strcmp(file_path, "/d20") == 0)
+        if (strcmp(file_route, "/d20") == 0)
         {
             // printf("URL path is /d20\n");
             // resp_404(fd);
