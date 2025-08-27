@@ -67,15 +67,16 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     // IMPLEMENT ME! //
     ///////////////////
 
-    // INIT length of header response 
+    // INIT length of header response
     int header_length = snprintf(response, max_response_size,
-        "%s\n" 
-        "Date: %s\n"
-        "Connection: close\n"
-        "Content-Length: %i\n"
-        "Content-Type: %s\n"
-        "\n", header, response_format, content_length, content_type);
-        
+                                 "%s\n"
+                                 "Date: %s\n"
+                                 "Connection: close\n"
+                                 "Content-Length: %i\n"
+                                 "Content-Type: %s\n"
+                                 "\n",
+                                 header, response_format, content_length, content_type);
+
     // APPEND body into response buffer after header
     memcpy(response + header_length, body, content_length);
 
@@ -172,6 +173,29 @@ void get_file(int fd, struct cache *cache, char *request_path)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
+    // INIT file attributes
+    char filepath[4096];
+    struct file_data *filedata;
+    char *mime_type;
+
+    // FETCH requested file from serverroot
+    snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_path);
+    filedata = file_load(filepath);
+    mime_type = mime_type_get(filepath);
+
+    // IF file exist in root
+    if (filedata != NULL)
+    {
+        // THEN send that file to client 
+        send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
+        file_free(filedata);
+    }
+    // ELSE
+    {
+        // THEN send 404 page
+        resp_404(fd);
+    }
 }
 
 /**
@@ -230,6 +254,10 @@ void handle_http_request(int fd, struct cache *cache)
             // printf("URL path is /d20\n");
             // resp_404(fd);
             get_d20(fd);
+        }
+        else
+        {
+            get_file(fd, cache, file_route);
         }
     }
 
