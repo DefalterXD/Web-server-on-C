@@ -156,6 +156,36 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
+    // INIT new cache entry
+    struct cache_entry *new_entry = alloc_entry(path, content_type, content, content_length);
+    if (!new_entry)
+    {
+        return 1;
+    } 
+
+    // INSERT cache_entry into the head of dllist
+    dllist_insert_head(cache, new_entry);
+
+    // CREATE hashtable inside cache index
+    cache->index = hashtable_create(128, NULL);
+    // PUT cache entry inside hashtable
+    hashtable_put(cache->index, path, new_entry);
+    // INCREMENT current cache size
+    cache->cur_size++;
+    // IF cache max size greater than current size
+    if (cache->max_size < cache->cur_size)
+    {
+        // THEN delist tail cache entry
+        dllist_remove_tail(cache->tail);
+        // DELETE from hashtable
+        hashtable_delete(cache->index, cache->tail->path);
+        // FREE entry from memory
+        free_entry(cache->tail);
+        // DECREMENT current_size
+        cache->cur_size--;
+    }
+
 }
 
 /**
