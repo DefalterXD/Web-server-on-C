@@ -69,14 +69,14 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
 
     // INIT length of header response
     int header_length = snprintf(response, max_response_size,
-                                 "%s\n"
-                                 "Date: %s\n"
-                                 "Connection: close\n"
-                                 "Content-Length: %i\n"
-                                 "Content-Type: %s\n"
-                                 "\n",
-                                 header, response_format, content_length, content_type);
-
+            "%s\n"
+            "Date: %s\n"
+            "Connection: close\n"
+            "Content-Length: %i\n"
+            "Content-Type: %s\n"
+            "\n",
+            header, response_format, content_length, content_type);
+            
     // APPEND body into response buffer after header
     memcpy(response + header_length, body, content_length);
 
