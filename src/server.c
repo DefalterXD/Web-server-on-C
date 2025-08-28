@@ -185,14 +185,15 @@ void get_file(int fd, struct cache *cache, char *request_path)
     // FETCH requested file from serverroot
     snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_path);
     filedata = file_load(filepath);
-    mime_type = mime_type_get(filepath);
-
+    
     // IF file exist in root
     if (filedata != NULL)
     {
+        mime_type = mime_type_get(filepath);
+        // PUT file into cache
+        cache_put(cache, request_path, mime_type, filedata->data, filedata->size);
         // THEN send that file to client 
         send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
-        file_free(filedata);
     }
     // ELSE
     {
