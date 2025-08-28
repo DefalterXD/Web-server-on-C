@@ -181,16 +181,16 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
     // INCREMENT current cache size
     cache->cur_size++;
     // IF cache max size greater than current size
-    if (cache->max_size < cache->cur_size)
+    if (cache->cur_size > cache->max_size)
     {
+        // INIT tail entry from cache
+        struct cache_entry *tail_entry =  hashtable_get(cache->index, cache->tail->path);
         // THEN delist tail cache entry
         dllist_remove_tail(cache);
         // DELETE from hashtable
-        hashtable_delete(cache->index, cache->tail->path);
+        hashtable_delete(cache->index, tail_entry->path);
         // FREE entry from memory
-        free_entry(cache->tail);
-        // DECREMENT current_size
-        cache->cur_size--;
+        free_entry(tail_entry);
     }
 }
 
