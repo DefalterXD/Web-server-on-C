@@ -198,4 +198,15 @@ struct cache_entry *cache_get(struct cache *cache, char *path)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
+    // INIT founded cache entry from hashtable
+    struct cache_entry *founded_cache = hashtable_get(cache->index, path);
+    if (!founded_cache)
+    {
+        return NULL;
+    }
+    // MOVE founded entry cache into head
+    dllist_move_to_head(cache, founded_cache);
+
+    return founded_cache;
 }
