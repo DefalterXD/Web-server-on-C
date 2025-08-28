@@ -16,7 +16,7 @@ struct cache_entry *alloc_entry(char *path, char *content_type, void *content, i
     struct cache_entry *new_entry = malloc(sizeof(*new_entry));
     if (!new_entry)
     {
-        return 1;
+        return NULL;
     }
 
     new_entry->path = path;
@@ -121,7 +121,7 @@ struct cache *cache_create(int max_size, int hashsize)
     struct cache *new_cache = malloc(sizeof(*new_cache));
     if (!new_cache)
     {
-        return 1;
+        return NULL;
     }
 
     // CREATE hashtable inside cache index
@@ -170,7 +170,7 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
     struct cache_entry *new_entry = alloc_entry(path, content_type, content, content_length);
     if (!new_entry)
     {
-        return 1;
+        return;
     }
 
     // INSERT cache_entry into the head of dllist
