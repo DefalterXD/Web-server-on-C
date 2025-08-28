@@ -38,6 +38,8 @@ void free_entry(struct cache_entry *entry)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
+    free(entry);
 }
 
 /**
