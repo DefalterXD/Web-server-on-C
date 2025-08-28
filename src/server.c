@@ -258,7 +258,20 @@ void handle_http_request(int fd, struct cache *cache)
         }
         else
         {
-            get_file(fd, cache, file_route);
+            // INIT cached file from requested file_route
+            struct cache_entry *founded_file = cache_get(cache, file_route);
+            // IF file is found from cache_entry
+            if (founded_file != NULL)
+            {
+                // THEN SERVE that file from cache
+                send_response(fd, "HTTP/1.1 200 OK", founded_file->content_type, founded_file->content, founded_file->content_length);
+            }
+            // ELSE
+            else
+            {
+                // SERVE that file from disk
+                get_file(fd, cache, file_route);
+            }
         }
     }
 
