@@ -48,6 +48,14 @@
  *
  * Return the value from the send() function.
  */
+
+static inline void populate_date_string(char *buf, size_t max_len)
+{
+    time_t rawtime = time(NULL);
+    struct tm *info = localtime(&rawtime);
+    strftime(buf, max_len, "%a %b %d %H:%M:%S %Z %Y", info);
+} 
+
 int send_response(int fd, char *header, char *content_type, void *body, int content_length)
 {
     const int max_response_size = 262144;
@@ -57,11 +65,7 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
 
     // GET time for the request
     char response_format[50];
-    time_t rawtime;
-    time(&rawtime);
-    struct tm *info;
-    info = localtime(&rawtime);
-    strftime(response_format, sizeof response_format, "%a %b %d %H:%M:%S %Z %Y", info);
+    populate_date_string(response_format, sizeof(response_format));
 
     ///////////////////
     // IMPLEMENT ME! //
@@ -250,8 +254,6 @@ void handle_http_request(int fd, struct cache *cache)
         // IF url path is /d20
         if (strcmp(file_route, "/d20") == 0)
         {
-            // printf("URL path is /d20\n");
-            // resp_404(fd);
             get_d20(fd);
         }
         else
