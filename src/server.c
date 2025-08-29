@@ -196,6 +196,7 @@ void get_file(int fd, struct cache *cache, char *request_path)
         send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
     }
     // ELSE
+    else
     {
         // THEN send 404 page
         resp_404(fd);
