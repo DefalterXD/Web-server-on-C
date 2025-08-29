@@ -54,7 +54,7 @@ static inline void populate_date_string(char *buf, size_t max_len)
     time_t rawtime = time(NULL);
     struct tm *info = localtime(&rawtime);
     strftime(buf, max_len, "%a %b %d %H:%M:%S %Z %Y", info);
-} 
+}
 
 int send_response(int fd, char *header, char *content_type, void *body, int content_length)
 {
@@ -73,14 +73,14 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
 
     // INIT length of header response
     int header_length = snprintf(response, max_response_size,
-            "%s\n"
-            "Date: %s\n"
-            "Connection: close\n"
-            "Content-Length: %i\n"
-            "Content-Type: %s\n"
-            "\n",
-            header, response_format, content_length, content_type);
-            
+                                 "%s\n"
+                                 "Date: %s\n"
+                                 "Connection: close\n"
+                                 "Content-Length: %i\n"
+                                 "Content-Type: %s\n"
+                                 "\n",
+                                 header, response_format, content_length, content_type);
+
     // APPEND body into response buffer after header
     memcpy(response + header_length, body, content_length);
 
@@ -185,21 +185,34 @@ void get_file(int fd, struct cache *cache, char *request_path)
     // FETCH requested file from serverroot
     snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_path);
     filedata = file_load(filepath);
-    
+
     // IF file exist in root
     if (filedata != NULL)
     {
         mime_type = mime_type_get(filepath);
         // PUT file into cache
         cache_put(cache, request_path, mime_type, filedata->data, filedata->size);
-        // THEN send that file to client 
+        // THEN send that file to client
         send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
     }
     // ELSE
     else
     {
-        // THEN send 404 page
-        resp_404(fd);
+        snprintf(filepath, sizeof filepath, "%s%sindex.html", SERVER_ROOT, request_path);
+        filedata = file_load(filepath);
+        if (filedata)
+        {
+            mime_type = mime_type_get(filepath);
+            // PUT file into cache
+            cache_put(cache, request_path, mime_type, filedata->data, filedata->size);
+            // THEN send that file to client
+            send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
+        }
+        else
+        {
+            // THEN send 404 page
+            resp_404(fd);
+        }
     }
 }
 
