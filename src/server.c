@@ -210,6 +210,18 @@ char *find_start_of_body(char *header)
     ///////////////////
     // IMPLEMENT ME! // (Stretch)
     ///////////////////
+
+    // INIT rest of the request
+    int rest_request = 0;
+    // INIT body of the post request
+    char *body;
+    // FIND the body and copy the rest of the request
+    sscanf(header, "%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n\r\n] %n", &rest_request);
+
+    // ASSIGN body part of the request
+    body = header + rest_request;
+
+    return body;
 }
 
 /**
@@ -280,11 +292,13 @@ void handle_http_request(int fd, struct cache *cache)
     // IF method is GET
     if (strcmp(http_method, "GET") == 0)
     {
+        //    Check if it's /d20 and handle that special case
         // IF url path is /d20
         if (strcmp(request_route, "/d20") == 0)
         {
             get_d20(fd);
         }
+        //    Otherwise serve the requested file by calling get_file()
         else
         {
             // INIT cached file from requested file_route
@@ -303,12 +317,14 @@ void handle_http_request(int fd, struct cache *cache)
             }
         }
     }
-
-    //    Check if it's /d20 and handle that special case
-    //    Otherwise serve the requested file by calling get_file()
-
     // (Stretch) If POST, handle the post request
+    else if (strcmp(http_method, "POST") == 0)
+    {
+        // SEND requests into find_start_of_body
+        char *request_body = find_start_of_body(request);
+    }
 }
+
 
 /**
  * Main
