@@ -39,6 +39,7 @@
 
 #define SERVER_FILES "./serverfiles"
 #define SERVER_ROOT "./serverroot"
+#define SERVER_ASSETS "."
 
 /**
  * Send an HTTP response
@@ -218,7 +219,7 @@ void handle_http_request(int fd, struct cache *cache)
 {
     const int request_buffer_size = 65536; // 64K
     char request[request_buffer_size];
-    // INIT filepath 
+    // INIT filepath
     char filepath[4096];
     // INIT buffer for filepath stats
     struct stat buffer;
@@ -251,22 +252,27 @@ void handle_http_request(int fd, struct cache *cache)
     snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
 
     // GET OS info stats to buffer
-    stat(filepath, &buffer);
-
-    // IF path is a directory
-    if (S_ISDIR(buffer.st_mode))
+    if (stat(filepath, &buffer) != 0)
     {
-        // THEN normalize requested path to automatic index.html
-        if (request_route[strlen(request_route) - 1] == '/')
+        snprintf(filepath, sizeof filepath, "%s%s", SERVER_ASSETS, request_route);
+    }
+    else
+    {
+        // IF path is a directory
+        if (S_ISDIR(buffer.st_mode))
         {
-            strcat(request_route, "index.html");
+            // THEN normalize requested path to automatic index.html
+            if (request_route[strlen(request_route) - 1] == '/')
+            {
+                strcat(request_route, "index.html");
+            }
+            else
+            {
+                strcat(request_route, "/index.html");
+            }
+            // ASSIGN normalize path with index.html
+            snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
         }
-        else
-        {
-            strcat(request_route, "/index.html");
-        }
-        // ASSIGN normalize path with index.html
-        snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
     }
 
     // If GET, handle the get endpoints
