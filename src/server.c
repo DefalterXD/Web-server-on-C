@@ -29,6 +29,7 @@
 #include <time.h>
 #include <sys/file.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include "net.h"
 #include "file.h"
 #include "mime.h"
@@ -171,19 +172,15 @@ void resp_404(int fd)
 /**
  * Read and return a file from disk or cache
  */
-void get_file(int fd, struct cache *cache, char *request_path)
+void get_file(int fd, struct cache *cache, char *request_path, char *filepath)
 {
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
-
     // INIT file attributes
-    char filepath[4096];
     struct file_data *filedata;
     char *mime_type;
 
-    // FETCH requested file from serverroot
-    snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_path);
     filedata = file_load(filepath);
 
     // IF file exist in root
@@ -195,24 +192,9 @@ void get_file(int fd, struct cache *cache, char *request_path)
         // THEN send that file to client
         send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
     }
-    // ELSE
     else
     {
-        snprintf(filepath, sizeof filepath, "%s%sindex.html", SERVER_ROOT, request_path);
-        filedata = file_load(filepath);
-        if (filedata)
-        {
-            mime_type = mime_type_get(filepath);
-            // PUT file into cache
-            cache_put(cache, request_path, mime_type, filedata->data, filedata->size);
-            // THEN send that file to client
-            send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
-        }
-        else
-        {
-            // THEN send 404 page
-            resp_404(fd);
-        }
+        resp_404(fd);
     }
 }
 
@@ -236,6 +218,10 @@ void handle_http_request(int fd, struct cache *cache)
 {
     const int request_buffer_size = 65536; // 64K
     char request[request_buffer_size];
+    // INIT filepath 
+    char filepath[4096];
+    // INIT buffer for filepath stats
+    struct stat buffer;
 
     // Read request
     int bytes_recvd = recv(fd, request, request_buffer_size - 1, 0);
@@ -256,10 +242,32 @@ void handle_http_request(int fd, struct cache *cache)
     char http_method[5];
 
     // INIT variable for file path
-    char file_route[2000];
+    char request_route[2000];
 
     // ASSIGN http method into variable
-    sscanf(request, "%s %s", http_method, file_route);
+    sscanf(request, "%s %s", http_method, request_route);
+
+    // ASSIGN full path from disk
+    snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
+
+    // GET OS info stats to buffer
+    stat(filepath, &buffer);
+
+    // IF path is a directory
+    if (S_ISDIR(buffer.st_mode))
+    {
+        // THEN normalize requested path to automatic index.html
+        if (request_route[strlen(request_route) - 1] == '/')
+        {
+            strcat(request_route, "index.html");
+        }
+        else
+        {
+            strcat(request_route, "/index.html");
+        }
+        // ASSIGN normalize path with index.html
+        snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
+    }
 
     // If GET, handle the get endpoints
 
@@ -267,14 +275,14 @@ void handle_http_request(int fd, struct cache *cache)
     if (strcmp(http_method, "GET") == 0)
     {
         // IF url path is /d20
-        if (strcmp(file_route, "/d20") == 0)
+        if (strcmp(request_route, "/d20") == 0)
         {
             get_d20(fd);
         }
         else
         {
             // INIT cached file from requested file_route
-            struct cache_entry *founded_file = cache_get(cache, file_route);
+            struct cache_entry *founded_file = cache_get(cache, request_route);
             // IF file is found from cache_entry
             if (founded_file != NULL)
             {
@@ -285,7 +293,7 @@ void handle_http_request(int fd, struct cache *cache)
             else
             {
                 // SERVE that file from disk
-                get_file(fd, cache, file_route);
+                get_file(fd, cache, request_route, filepath);
             }
         }
     }
