@@ -39,7 +39,7 @@
 
 #define SERVER_FILES "./serverfiles"
 #define SERVER_ROOT "./serverroot"
-#define SERVER_ASSETS "."
+#define SERVER_ASSETS "./assets"
 
 /**
  * Send an HTTP response
