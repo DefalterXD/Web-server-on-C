@@ -223,8 +223,8 @@ char *find_start_of_body(char *header)
     {
         return NULL;
     }
-    strcpy(body, header + rest_request);
-    strcat(body, "\n");
+    strlcpy(body, header + rest_request, strlen(header));
+    strlcat(body, "\n", strlen(header) + 2);
 
     return body;
 }
@@ -323,11 +323,11 @@ void handle_http_request(int fd, struct cache *cache)
             // THEN normalize requested path to automatic index.html
             if (request_route[strlen(request_route) - 1] == '/')
             {
-                strcat(request_route, "index.html");
+                strlcat(request_route, "index.html", sizeof(request_route));
             }
             else
             {
-                strcat(request_route, "/index.html");
+                strlcat(request_route, "/index.html", sizeof(request_route));
             }
             // ASSIGN normalize path with index.html
             snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
