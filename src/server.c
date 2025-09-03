@@ -253,6 +253,20 @@ void save_post(int postfd, char *body)
         file_free(filedata);
     }
 
+    // INIT file descriptor for saving file
+    postfd = open("post_data.txt", O_CREAT | O_WRONLY | O_APPEND, 0644);
+    if (postfd < 0)
+    {
+        perror("r1");
+        exit(1);
+    }
+
+    // WRITE into the file
+    write(postfd, body, strlen(body));
+
+    free(body);
+    
+    close(postfd);
 }
 
 /**
