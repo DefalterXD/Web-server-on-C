@@ -230,6 +230,32 @@ char *find_start_of_body(char *header)
 }
 
 /**
+ * 
+ * Handle save file for body from post request
+ *
+ **/
+void save_post(int postfd, char *body)
+{
+    // INIT file attributes
+    char jsonpath[2048];
+    struct file_data *filedata;
+    char *mime_type = NULL;
+
+    snprintf(jsonpath, sizeof jsonpath, "%s/post.json", SERVER_ROOT);
+
+    filedata = file_load(jsonpath);
+
+    
+    if (filedata != NULL)
+    {
+        if (mime_type == NULL) mime_type = mime_type_get(jsonpath);
+        send_response(postfd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
+        file_free(filedata);
+    }
+
+}
+
+/**
  * Handle HTTP request and send response
  */
 void handle_http_request(int fd, struct cache *cache)
@@ -329,6 +355,9 @@ void handle_http_request(int fd, struct cache *cache)
     {
         // SEND requests into find_start_of_body
         char *request_body = find_start_of_body(request);
+
+        // SAVE data from body
+        save_post(fd, request_body);
     }
 }
 
