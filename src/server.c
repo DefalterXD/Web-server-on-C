@@ -236,6 +236,8 @@ void handle_http_request(int fd, struct cache *cache)
 {
     const int request_buffer_size = 65536; // 64K
     char request[request_buffer_size];
+    // RESET request for remaining values
+    memset(request, 0, request_buffer_size);
     // INIT filepath
     char filepath[4096];
     // INIT buffer for filepath stats
