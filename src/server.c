@@ -213,13 +213,18 @@ char *find_start_of_body(char *header)
 
     // INIT rest of the request
     int rest_request = 0;
-    // INIT body of the post request
-    char *body;
+
     // FIND the body and copy the rest of the request
     sscanf(header, "%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n\r\n] %n", &rest_request);
 
-    // ASSIGN body part of the request
-    body = header + rest_request;
+    // INIT newbody with new line
+    char *body = malloc(strlen(header) + 2);
+    if (!body)
+    {
+        return NULL;
+    }
+    strcpy(body, header + rest_request);
+    strcat(body, "\n");
 
     return body;
 }
