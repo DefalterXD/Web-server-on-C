@@ -361,8 +361,18 @@ void handle_http_request(int fd, struct cache *cache)
             {
                 // INIT difference in time between entry and request
                 int time_difference = difftime(request_created_time, founded_file->created_at);
-                // THEN SERVE that file from cache
-                send_response(fd, "HTTP/1.1 200 OK", founded_file->content_type, founded_file->content, founded_file->content_length);
+                // IF cache entry was stale for 1 minute
+                if (time_difference > 60)
+                {
+                    // THEN remove that entry and put a new one
+                    remove_entry(cache, founded_file);
+                    get_file(fd, cache, request_route, filepath);
+                }
+                else
+                {
+                    // THEN SERVE that file from cache
+                    send_response(fd, "HTTP/1.1 200 OK", founded_file->content_type, founded_file->content, founded_file->content_length);
+                }
             }
             // ELSE
             else
