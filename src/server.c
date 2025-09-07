@@ -285,6 +285,8 @@ void handle_http_request(int fd, struct cache *cache)
     char filepath[4096];
     // INIT buffer for filepath stats
     struct stat buffer;
+    // INIT current time of requst
+    time_t request_created_time;
 
     // Read request
     int bytes_recvd = recv(fd, request, request_buffer_size - 1, 0);
@@ -336,6 +338,7 @@ void handle_http_request(int fd, struct cache *cache)
             snprintf(filepath, sizeof filepath, "%s%s", SERVER_ROOT, request_route);
         }
     }
+    time(&request_created_time);
 
     // If GET, handle the get endpoints
 
@@ -356,6 +359,8 @@ void handle_http_request(int fd, struct cache *cache)
             // IF file is found from cache_entry
             if (founded_file != NULL)
             {
+                // INIT difference in time between entry and request
+                int time_difference = difftime(request_created_time, founded_file->created_at);
                 // THEN SERVE that file from cache
                 send_response(fd, "HTTP/1.1 200 OK", founded_file->content_type, founded_file->content, founded_file->content_length);
             }
