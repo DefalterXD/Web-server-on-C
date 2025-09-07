@@ -217,3 +217,24 @@ struct cache_entry *cache_get(struct cache *cache, char *path)
     // RETURN founded cache entry
     return founded_entry;
 }
+
+/**
+* Remove stale cache entry
+*/
+void remove_entry(struct cache *cache, struct cache_entry *cache_entry)
+{
+    // IF cache has only one entry
+    if (cache_entry->next == NULL)
+    {
+        cache->head = NULL;
+        cache->tail = NULL;
+        free_entry(cache_entry);
+    }
+    else
+    {
+        cache->head = cache_entry->next;
+        cache_entry->next->prev = NULL;
+        free_entry(cache_entry);
+    }
+    cache->cur_size--;
+}
