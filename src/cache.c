@@ -7,7 +7,7 @@
 /**
  * Allocate a cache entry
  */
-struct cache_entry *alloc_entry(char *path, char *content_type, void *content, int content_length)
+struct cache_entry *alloc_entry(char *path, char *content_type, void *content, int content_length, time_t time)
 {
     ///////////////////
     // IMPLEMENT ME! //
@@ -23,6 +23,7 @@ struct cache_entry *alloc_entry(char *path, char *content_type, void *content, i
     new_entry->content_type = content_type;
     new_entry->content_length = content_length;
     new_entry->content = content;
+    new_entry->created_at = time;
 
     new_entry->prev = NULL;
     new_entry->next = NULL;
@@ -160,14 +161,14 @@ void cache_free(struct cache *cache)
  *
  * NOTE: doesn't check for duplicate cache entries
  */
-void cache_put(struct cache *cache, char *path, char *content_type, void *content, int content_length)
+void cache_put(struct cache *cache, char *path, char *content_type, void *content, int content_length, time_t time)
 {
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
 
     // INIT new cache entry
-    struct cache_entry *new_entry = alloc_entry(path, content_type, content, content_length);
+    struct cache_entry *new_entry = alloc_entry(path, content_type, content, content_length, time);
     if (!new_entry)
     {
         return;
@@ -184,7 +185,7 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
     if (cache->cur_size > cache->max_size)
     {
         // INIT tail entry from cache
-        struct cache_entry *tail_entry =  hashtable_get(cache->index, cache->tail->path);
+        struct cache_entry *tail_entry = hashtable_get(cache->index, cache->tail->path);
         // THEN delist tail cache entry
         dllist_remove_tail(cache);
         // DELETE from hashtable
