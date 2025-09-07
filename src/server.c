@@ -178,9 +178,11 @@ void get_file(int fd, struct cache *cache, char *request_path, char *filepath)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+
     // INIT file attributes
     struct file_data *filedata;
     char *mime_type;
+    time_t cache_date_created;
 
     filedata = file_load(filepath);
 
@@ -188,8 +190,9 @@ void get_file(int fd, struct cache *cache, char *request_path, char *filepath)
     if (filedata != NULL)
     {
         mime_type = mime_type_get(filepath);
+        time(&cache_date_created);
         // PUT file into cache
-        cache_put(cache, request_path, mime_type, filedata->data, filedata->size);
+        cache_put(cache, request_path, mime_type, filedata->data, filedata->size, cache_date_created);
         // THEN send that file to client
         send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
     }
