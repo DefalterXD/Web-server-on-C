@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,10 +20,11 @@ struct cache_entry *alloc_entry(char *path, char *content_type, void *content, i
         return NULL;
     }
 
-    new_entry->path = path;
-    new_entry->content_type = content_type;
+    new_entry->path = strdup(path);
+    new_entry->content_type = strdup(content_type);
     new_entry->content_length = content_length;
-    new_entry->content = content;
+    new_entry->content = malloc(content_length);
+    memcpy(new_entry->content, content, content_length);
     new_entry->created_at = time;
 
     new_entry->prev = NULL;
@@ -40,6 +42,10 @@ void free_entry(struct cache_entry *entry)
     // IMPLEMENT ME! //
     ///////////////////
 
+    if (!entry) { return; }
+    free(entry->path);
+    free(entry->content_type);
+    free(entry->content);
     free(entry);
 }
 
