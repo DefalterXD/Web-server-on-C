@@ -18,7 +18,14 @@ struct cache {
     struct cache_entry *head, *tail; // Doubly-linked list
     int max_size; // Maxiumum number of entries
     int cur_size; // Current number of entries
+    pthread_mutex_t lock; // Mutex for thread lock/unlock states
 };
+
+typedef struct  
+{ 
+    int sockfd;
+    struct cache *cache; 
+} thread_config_t;
 
 extern struct cache_entry *alloc_entry(char *path, char *content_type, void *content, int content_length, time_t time);
 extern void free_entry(struct cache_entry *entry);
