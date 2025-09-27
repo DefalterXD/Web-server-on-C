@@ -30,6 +30,7 @@
 #include <sys/file.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #include "net.h"
 #include "file.h"
 #include "mime.h"
@@ -393,6 +394,25 @@ void handle_http_request(int fd, struct cache *cache)
     }
 }
 
+/**
+ * 
+ * 
+ * 
+ */ 
+void *server_thread(void *arg) {
+    thread_config_t *config = (thread_config_t*)arg;
+    int sockfd = config->sockfd;
+    struct cache *cache = config->cache;
+    free(config);
+
+    unsigned long id = (unsigned long)pthread_self();
+    printf("Thread %lu created to handle connection with socket %d\n", id, sockfd);
+    handle_http_request(sockfd, cache);
+    printf("Thread %lu is done\n", id);
+    close(sockfd);
+    return 0;
+}
+
 
 /**
  * Main
@@ -423,7 +443,7 @@ int main(void)
     while (1)
     {
         socklen_t sin_size = sizeof their_addr;
-
+        
         // Parent process will block on the accept() call until someone
         // makes a new connection:
         newfd = accept(listenfd, (struct sockaddr *)&their_addr, &sin_size);
@@ -432,19 +452,28 @@ int main(void)
             perror("accept");
             continue;
         }
-
+        
         // Print out a message that we got the connection
         inet_ntop(their_addr.ss_family,
                   get_in_addr((struct sockaddr *)&their_addr),
                   s, sizeof s);
         printf("server: got connection from %s\n", s);
+        pthread_t thread;
+
+        thread_config_t *config = (thread_config_t*)malloc(sizeof(*config));
+        if(!config)
+        {
+            perror("OOM");
+            continue;
+        }
+        config->sockfd = newfd;
+        config->cache = cache;
+        pthread_create(&thread, NULL, server_thread, config);
 
         // newfd is a new socket descriptor for the new connection.
         // listenfd is still listening for new connections.
 
-        handle_http_request(newfd, cache);
-
-        close(newfd);
+        pthread_detach(thread);
     }
 
     // Unreachable code
