@@ -43,6 +43,16 @@
 #define SERVER_ASSETS "./assets"
 
 /**
+ * Getting date for HTTP response
+ * */
+static inline void populate_date_string(char *buf, size_t max_len)
+{
+    time_t rawtime = time(NULL);
+    struct tm *info = localtime(&rawtime);
+    strftime(buf, max_len, "%a %b %d %H:%M:%S %Z %Y", info);
+}
+
+/**
  * Send an HTTP response
  *
  * header:       "HTTP/1.1 404 NOT FOUND" or "HTTP/1.1 200 OK", etc.
@@ -51,14 +61,6 @@
  *
  * Return the value from the send() function.
  */
-
-static inline void populate_date_string(char *buf, size_t max_len)
-{
-    time_t rawtime = time(NULL);
-    struct tm *info = localtime(&rawtime);
-    strftime(buf, max_len, "%a %b %d %H:%M:%S %Z %Y", info);
-}
-
 int send_response(int fd, char *header, char *content_type, void *body, int content_length)
 {
     const int max_response_size = 262144;
@@ -209,26 +211,16 @@ void get_file(int fd, struct cache *cache, char *request_path, char *filepath)
  * "Newlines" in HTTP can be \r\n (carriage return followed by newline) or \n
  * (newline) or \r (carriage return).
  */
-char *find_start_of_body(char *header)
+char *find_start_of_body(char *request)
 {
     ///////////////////
     // IMPLEMENT ME! // (Stretch)
     ///////////////////
 
-    // INIT rest of the request
-    int rest_request = 0;
+    char *body = strstr(request, "\r\n\r\n");
 
-    // FIND the body and copy the rest of the request
-    sscanf(header, "%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n]%*s%*[^\r\n\r\n] %n", &rest_request);
-
-    // INIT newbody with new line
-    char *body = malloc(strlen(header) + 2);
-    if (!body)
-    {
-        return NULL;
-    }
-    strlcpy(body, header + rest_request, strlen(header));
-    strlcat(body, "\n", strlen(header) + 2);
+    strlcpy(body, body + 4, strlen(body));
+    strlcat(body, "\n", strlen(body) + 2);
 
     return body;
 }
@@ -267,8 +259,6 @@ void save_post(int postfd, char *body)
 
     // WRITE into the file
     write(postfd, body, strlen(body));
-
-    free(body);
     
     close(postfd);
 }
@@ -443,7 +433,6 @@ int main(void)
     while (1)
     {
         socklen_t sin_size = sizeof their_addr;
-        
         // Parent process will block on the accept() call until someone
         // makes a new connection:
         newfd = accept(listenfd, (struct sockaddr *)&their_addr, &sin_size);
