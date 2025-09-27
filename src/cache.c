@@ -104,12 +104,12 @@ void dllist_move_to_head(struct cache *cache, struct cache_entry *ce)
 struct cache_entry *dllist_remove_tail(struct cache *cache)
 {
     struct cache_entry *oldtail = cache->tail;
-
+    
     cache->tail = oldtail->prev;
     cache->tail->next = NULL;
 
     cache->cur_size--;
-
+    
     return oldtail;
 }
 
@@ -124,26 +124,28 @@ struct cache *cache_create(int max_size, int hashsize)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
-
+    
     struct cache *new_cache = malloc(sizeof(*new_cache));
     if (!new_cache)
     {
         return NULL;
     }
+    pthread_mutex_init(&new_cache->lock, NULL);
 
     // CREATE hashtable inside cache index
-    new_cache->index = hashtable_create(128, NULL);
+    new_cache->index = hashtable_create(hashsize, NULL);
     new_cache->head = NULL;
     new_cache->tail = NULL;
 
     new_cache->max_size = max_size;
-    new_cache->cur_size = hashsize;
+    new_cache->cur_size = 0;
 
     return new_cache;
 }
 
 void cache_free(struct cache *cache)
 {
+    pthread_mutex_destroy(&cache->lock);
     struct cache_entry *cur_entry = cache->head;
 
     hashtable_destroy(cache->index);
@@ -172,13 +174,13 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
-
     // INIT new cache entry
     struct cache_entry *new_entry = alloc_entry(path, content_type, content, content_length, time);
     if (!new_entry)
     {
         return;
     }
+    pthread_mutex_lock(&cache->lock);
 
     // INSERT cache_entry into the head of dllist
     dllist_insert_head(cache, new_entry);
@@ -199,6 +201,7 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
         // FREE entry from memory
         free_entry(tail_entry);
     }
+    pthread_mutex_unlock(&cache->lock);
 }
 
 /**
@@ -209,17 +212,18 @@ struct cache_entry *cache_get(struct cache *cache, char *path)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
-
     // INIT founded cache entry
+    pthread_mutex_lock(&cache->lock);
     struct cache_entry *founded_entry = hashtable_get(cache->index, path);
     if (!founded_entry)
     {
+        pthread_mutex_unlock(&cache->lock);
         return NULL;
     }
-
-    // MOVE founded entry to head
     dllist_move_to_head(cache, founded_entry);
 
+    // MOVE founded entry to head
+    pthread_mutex_unlock(&cache->lock);
     // RETURN founded cache entry
     return founded_entry;
 }
@@ -229,6 +233,7 @@ struct cache_entry *cache_get(struct cache *cache, char *path)
 */
 void remove_entry(struct cache *cache, struct cache_entry *cache_entry)
 {
+    pthread_mutex_lock(&cache->lock);
     // IF cache has only one entry
     if (cache_entry->next == NULL)
     {
@@ -243,4 +248,5 @@ void remove_entry(struct cache *cache, struct cache_entry *cache_entry)
         free_entry(cache_entry);
     }
     cache->cur_size--;
+    pthread_mutex_unlock(&cache->lock);
 }
