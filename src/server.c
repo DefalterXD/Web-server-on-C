@@ -295,7 +295,7 @@ void handle_http_request(int fd, struct cache *cache)
     // Read the first two components of the first line of the request
 
     // INIT variable for http method
-    char http_method[5];
+    char http_method[10];
 
     // INIT variable for file path
     char request_route[2000];
