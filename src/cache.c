@@ -10,9 +10,6 @@
  */
 struct cache_entry *alloc_entry(char *path, char *content_type, void *content, int content_length, time_t time)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
 
     struct cache_entry *new_entry = malloc(sizeof(*new_entry));
     if (!new_entry)
@@ -38,10 +35,6 @@ struct cache_entry *alloc_entry(char *path, char *content_type, void *content, i
  */
 void free_entry(struct cache_entry *entry)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
-
     if (!entry) { return; }
     free(entry->path);
     free(entry->content_type);
@@ -171,9 +164,7 @@ void cache_free(struct cache *cache)
  */
 void cache_put(struct cache *cache, char *path, char *content_type, void *content, int content_length, time_t time)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+
     // INIT new cache entry
     struct cache_entry *new_entry = alloc_entry(path, content_type, content, content_length, time);
     if (!new_entry)
