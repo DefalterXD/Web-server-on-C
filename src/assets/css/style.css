@@ -64,6 +64,13 @@ body {
     }
 }
 
+.main__container.more {
+    grid-template-columns: 1fr;
+
+    & .text__container.more {
+        max-width: 75ch;
+    }
+}
 
 .form__container {
     scroll-margin-top: 5rem;
