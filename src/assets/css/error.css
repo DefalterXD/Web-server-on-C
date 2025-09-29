@@ -1,0 +1,44 @@
+:root {
+    --mainColor: #213F69;
+    --secondColor: #16263b;
+    --accentColor: #fff;
+    --btnColor: #3e8030;
+}
+
+body {
+    height: 100dvh;
+    display: grid;
+    place-content: center;
+    background-color: var(--secondColor);
+    color: var(--accentColor);
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.main__container {
+    display: grid;
+    gap: 24px;
+    justify-items: center;
+
+    & h1 {
+        font-size: 3rem;
+    }
+
+    & p {
+        font-size: 2rem;
+    }
+
+    & button {
+        padding: 0.8em 0.8em;
+        background-color: var(--btnColor);
+        font-size: 1.2rem;
+        border-style: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    
+    & a {
+        color: var(--accentColor);
+        text-decoration: none;
+    }
+}
