@@ -74,10 +74,6 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     char response_format[50];
     populate_date_string(response_format, sizeof(response_format));
 
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
-
     // INIT length of header response
     int header_length = snprintf(response, max_response_size,
                                  "%s\n"
@@ -112,10 +108,6 @@ void get_d20(int fd)
 {
     // Generate a random number between 1 and 20 inclusive
 
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
-
     // INIT max number
     int max = 20;
     // INIT min number
@@ -141,11 +133,6 @@ void get_d20(int fd)
     // ENDFOR
 
     // Use send_response() to send it back as text/plain data
-
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
-
     send_response(fd, "HTTP/1.1 200 OK", "text/plain", buff_number, byte_length);
 }
 
@@ -180,10 +167,6 @@ void resp_404(int fd)
  */
 void get_file(int fd, struct cache *cache, char *request_path, char *filepath)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
-
     // INIT file attributes
     struct file_data *filedata;
     char *mime_type;
@@ -215,10 +198,6 @@ void get_file(int fd, struct cache *cache, char *request_path, char *filepath)
  */
 char *find_start_of_body(char *request)
 {
-    ///////////////////
-    // IMPLEMENT ME! // (Stretch)
-    ///////////////////
-
     char *body = strstr(request, "\r\n\r\n");
 
     strlcpy(body, body + 4, strlen(body));
@@ -289,10 +268,6 @@ void handle_http_request(int fd, struct cache *cache)
         perror("recv");
         return;
     }
-
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
 
     // Read the first two components of the first line of the request
 
