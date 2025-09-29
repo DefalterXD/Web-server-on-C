@@ -13,3 +13,34 @@ body {
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     color: var(--accentColor);
 }
+
+.header__container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.2em;
+    background-color: var(--mainColor);
+    position: fixed;
+    top: 0;
+    min-width: 100%;
+
+    & a {
+        color: var(--accentColor);
+        text-decoration: none;
+    }
+
+    & .nav__container ul {
+        display: flex;
+        list-style: none;
+        gap: 12px;
+
+        & li {
+            font-size: 1.2rem;
+        }
+
+        & li a {
+            color: var(--accentColor);
+            text-decoration: none;
+        }
+    }
+}
