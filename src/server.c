@@ -14,6 +14,8 @@
  *    curl -D - -X POST -H 'Content-Type: text/plain' -d 'Hello, sample data!' http://localhost:3490/save
  *
  * (Posting data is harder to test from a browser.)
+ * 
+ *  With the guidance of ChatGPT and mostly guidance (his code was horrible or doesn't make sense)
  */
 
 #include <stdio.h>
