@@ -44,3 +44,23 @@ body {
         }
     }
 }
+
+.main__container {
+    scroll-margin-top: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    justify-items: center;
+    align-items: center;
+    background-color: var(--secondColor);
+    padding: 3em;
+
+    & img {
+        border-radius: 25px;
+    }
+
+    & .text__container {
+        max-width: 50ch;
+        text-align: center;
+    }
+}
+
