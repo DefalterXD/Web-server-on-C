@@ -64,3 +64,42 @@ body {
     }
 }
 
+
+.form__container {
+    scroll-margin-top: 5rem;
+    display: flex;
+    justify-content: center;
+    background-color: var(--secondColor);
+    padding: 3em;
+
+    & form {
+        display: grid;
+        border: 5px solid #fff;
+        padding: 2em;
+        border-radius: 25px;
+        gap: 12px;
+        width: 50vw;
+
+        & input {
+            width: 100%;
+            padding: 0.5em 0.4em;
+            border-radius: 12px;
+        }
+
+        & > div {
+            display: grid;
+            gap: 12px;
+        }
+
+        & button {
+            padding: 0.5em 0.4em;
+            color: var(--accentColor);
+            background-color: var(--btnColor);
+            font-size: 1.2rem;
+            border-style: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    }
+}
