@@ -363,7 +363,7 @@ void handle_http_request(int fd, struct cache *cache)
 
 /**
  * 
- * 
+ * Thread handler for each request
  * 
  */ 
 void *server_thread(void *arg) {
